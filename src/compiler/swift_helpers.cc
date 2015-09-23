@@ -145,7 +145,7 @@ namespace google { namespace protobuf { namespace compiler { namespace swift {
             SwiftFileOptions options = file->options().GetExtension(swift_file_options);
             return options.compile_for_framework();
         }
-        return true;
+        return false;
     }
 
     string GetAccessControlType(const FileDescriptor* file) {
