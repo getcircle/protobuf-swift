@@ -409,7 +409,7 @@ namespace google { namespace protobuf { namespace compiler { namespace swift {
         string name = PackageName(descriptor);
 
         if (descriptor->containing_type() != NULL) {
-            name = ClassNameWorker(descriptor->containing_type());
+            name += ClassNameWorker(descriptor->containing_type());
             name += ".";
         }
    
@@ -468,9 +468,11 @@ namespace google { namespace protobuf { namespace compiler { namespace swift {
     ////
     
     string ClassNameWorkerExtensions(const Descriptor* descriptor) {
-        string name;
+        string name = PackageName(descriptor);
+        name = StringReplace(name, ".", "_", true);
+        name = UnderscoresToCapitalizedCamelCase(name);
         if (descriptor->containing_type() != NULL) {
-            name = ClassNameWorkerExtensions(descriptor->containing_type());
+            name += ClassNameWorkerExtensions(descriptor->containing_type());
             name += "";
         }
         return CheckReservedNames(name + descriptor->name());
