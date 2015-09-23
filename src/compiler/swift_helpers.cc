@@ -56,7 +56,7 @@ namespace google { namespace protobuf { namespace compiler { namespace swift {
     }
 
 
-    string UnderscoresToCapitalizedCamelCase(const string& input) {
+    vector<string> GetStringVectorsWithUnderscoresStripped(const string& input) {
         vector<string> values;
         string current;
 
@@ -96,6 +96,29 @@ namespace google { namespace protobuf { namespace compiler { namespace swift {
         }
         values.push_back(current);
 
+		return values;
+	}
+	
+	string UnderscoresToCapitalizedCamelCase(const string& input) {
+        vector<string> values = GetStringVectorsWithUnderscoresStripped(input);
+        for (vector<string>::iterator i = values.begin(); i != values.end(); ++i) {
+            string value = *i;
+            for (unsigned int j = 0; j < value.length(); j++) {
+                if (j == 0) {
+                    value[j] = toupper(value[j]);
+                }
+            }
+            *i = value;
+        }
+        string result;
+        for (vector<string>::iterator i = values.begin(); i != values.end(); ++i) {
+            result += *i;
+        }
+        return CheckReservedNames(result);
+    }
+	
+	string UnderscoresToEnumCapitalizedCamelCase(const string& input) {
+		vector<string> values = GetStringVectorsWithUnderscoresStripped(input);
         for (vector<string>::iterator i = values.begin(); i != values.end(); ++i) {
             string value = *i;
             for (unsigned int j = 0; j < value.length(); j++) {
@@ -489,8 +512,8 @@ namespace google { namespace protobuf { namespace compiler { namespace swift {
 
     //Swift bug: when enumName == enaumFieldName
     string EnumValueName(const EnumValueDescriptor* descriptor) {
-        string name = UnderscoresToCapitalizedCamelCase(SafeName(descriptor->name()));
-        if (name == UnderscoresToCapitalizedCamelCase(descriptor->type()->name())) {
+        string name = UnderscoresToEnumCapitalizedCamelCase(SafeName(descriptor->name()));
+        if (name == UnderscoresToEnumCapitalizedCamelCase(descriptor->type()->name())) {
             name += "Field";
         }
         return name;
